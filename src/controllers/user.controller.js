@@ -5,6 +5,29 @@ import User from "../models/user.model.js";
 import { uploadImageOnCloudinary } from "../utils/cloudinary.util.js";
 import  fs  from "fs";
 
+const options = {
+  httpOnly: true,
+  secure: true
+};
+
+const generateAccessTokenAndRefreshToken = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+  
+    user.refreshToken = refreshToken;
+    const saveData = await user.save({ validateBeforeSave: false });
+    if (!saveData) {
+      throw new ApiError(500, "Error while generating tokens");
+    }
+  
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+}
+
 const registerUser = asyncHandler(async (req, res) => {
   try {
     const { userName, fullName, email, password } = req.body;
@@ -61,4 +84,44 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser };
+const loginUser = asyncHandler(async (req, res) => {
+  const { userName, email, password } = req.body;
+
+  if ((!email && !userName)|| !password) {
+    throw new ApiError(400, "Username and password are required");
+  }
+
+  const user = await User.findOne({ $or: [{ userName }, { email }] });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Wrong password");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
+
+  const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+  if (!loggedInUser) {
+    throw new ApiError(500, "Error while logging in");
+  }
+
+  res
+  .status(200)
+  .cookie("refreshToken", refreshToken, options)
+  .cookie("accessToken", accessToken, options)
+  .json(new ApiResponse(200, {
+    user: loggedInUser,
+    accessToken,
+    refreshToken
+  }, "User logged in successfully"));
+
+  
+});
+
+export { registerUser, loginUser};
