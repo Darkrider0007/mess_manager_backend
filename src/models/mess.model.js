@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 
 const messSchema = new Schema({
@@ -41,6 +42,8 @@ const messSchema = new Schema({
     ],
 
 },{timestamps: true});
+
+messSchema.plugin(mongooseAggregatePaginate);
 
 
 export default model("Mess", messSchema);
