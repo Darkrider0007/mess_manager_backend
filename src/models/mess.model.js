@@ -15,9 +15,9 @@ const messSchema = new Schema({
         type: String,
         required: [true, "Description is required"],
     },
-    messAvatar:{
+    messLogo:{
         type: String,
-        required: [true, "Avatar is required"],
+        required: [true, "Logo is required"],
     },
     messAdmin:{
         type: Schema.Types.ObjectId,

@@ -56,6 +56,7 @@ const registerUser = asyncHandler(async (req, res) => {
         field => field === undefined || field?.trim() === ""
       )
     ) {
+      fs.unlinkSync(req.file?.path);
       throw new ApiError(400, "All fields are required");
     }
 
@@ -75,6 +76,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const uploadedAvatar = await uploadImageOnCloudinary(imageLocalPath);
 
     if (!uploadedAvatar) {
+      fs.unlinkSync(req.file?.path);
       throw new ApiError(500, "Error while uploading avatar");
     }
 
