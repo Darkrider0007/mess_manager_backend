@@ -314,6 +314,69 @@ const updateMessAdmin = asyncHandler(async (req, res) => {
   }
 });
 
+const addMessMenu = asyncHandler(async (req, res) => {
+  try {
+    const messId = req.params.messId;
+    if (!messId) {
+      throw new ApiError(400, "Mess Id is required");
+    }
+
+    const { menu } = req.body;
+    if (!menu) {
+      throw new ApiError(400, "Menu is required");
+    }
+
+    const mess = await Mess.findById(messId);
+    if (!mess) {
+      throw new ApiError(404, "Mess not found");
+    }
+
+    if (mess.messAdmin.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "You are not authorized to add menu");
+    }
+
+    mess.messMenu.push(menu);
+    await mess.save();
+
+    res.status(200).json(new ApiResponse(200, mess, "Menu Added"));
+    
+  } catch (error) {
+    throw new ApiError(500, error.message);    
+  }
+});
+
+const removeMessMenu = asyncHandler(async (req, res) => {
+  try {
+    const messId = req.params.messId;
+    if (!messId) {
+      throw new ApiError(400, "Mess Id is required");
+    }
+
+    const { menu } = req.body;
+    if (!menu) {
+      throw new ApiError(400, "Menu is required");
+    }
+
+    const mess = await Mess.findById(messId);
+    if (!mess) {
+      throw new ApiError(404, "Mess not found");
+    }
+
+    if (mess.messAdmin.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "You are not authorized to remove menu");
+    }
+
+    const removedMenu = mess.messMenu.filter(m => m !== menu);
+    mess.messMenu = removedMenu;
+    await mess.save();
+
+    res.status(200).json(new ApiResponse(200, mess, "Menu Removed"));
+    
+  } catch (error) {
+    throw new ApiError(500, error.message);    
+  }
+});
+
 export {
   createNewMess,
   getMessInfo,
@@ -323,4 +386,6 @@ export {
   updateMessInfo,
   updateMessLogo,
   updateMessAdmin,
+  addMessMenu,
+  removeMessMenu
 };

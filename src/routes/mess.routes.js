@@ -3,10 +3,12 @@ import { verifyJWT } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
 import {
   addMemberToMess,
+  addMessMenu,
   createNewMess,
   getMessInfo,
   getMessMembersInfo,
   removeMemberFromMess,
+  removeMessMenu,
   updateMessAdmin,
   updateMessInfo,
   updateMessLogo,
@@ -24,5 +26,7 @@ router.get("/get-mess-members-info/:messId", getMessMembersInfo);
 router.patch("/update-mess-info/:messId", updateMessInfo);
 router.patch("/update-mess-logo/:messId", upload.single("messLogo"), updateMessLogo);
 router.patch("/update-mess-admin/:messId", updateMessAdmin);
+router.patch("/add-mess-menu/:messId", addMessMenu);
+router.patch("/remove-mess-menu/:messId", removeMessMenu);
 
 export default router;
