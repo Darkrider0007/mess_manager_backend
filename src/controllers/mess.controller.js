@@ -377,6 +377,23 @@ const removeMessMenu = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteMess = asyncHandler(async (req, res) => {
+  try {
+    const messId = req.params.messId;
+    if (!messId) {
+      throw new ApiError(400, "Mess Id is required");
+    }
+
+    await Mess.findByIdAndDelete(messId);
+
+    res.status(200).json(new ApiResponse(200, {}, "Mess Removed"));
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+});
+    
+
+
 export {
   createNewMess,
   getMessInfo,
@@ -387,5 +404,6 @@ export {
   updateMessLogo,
   updateMessAdmin,
   addMessMenu,
-  removeMessMenu
+  removeMessMenu,
+  deleteMess,
 };

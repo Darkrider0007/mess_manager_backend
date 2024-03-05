@@ -5,6 +5,7 @@ import {
   addMemberToMess,
   addMessMenu,
   createNewMess,
+  deleteMess,
   getMessInfo,
   getMessMembersInfo,
   removeMemberFromMess,
@@ -28,5 +29,6 @@ router.patch("/update-mess-logo/:messId", upload.single("messLogo"), updateMessL
 router.patch("/update-mess-admin/:messId", updateMessAdmin);
 router.patch("/add-mess-menu/:messId", addMessMenu);
 router.patch("/remove-mess-menu/:messId", removeMessMenu);
+router.delete("/delete-mess/:messId", deleteMess);
 
 export default router;
