@@ -7,6 +7,7 @@ import {
   getMessInfo,
   getMessMembersInfo,
   removeMemberFromMess,
+  updateMessAdmin,
   updateMessInfo,
   updateMessLogo,
 } from "../controllers/mess.controller.js";
@@ -22,5 +23,6 @@ router.delete("/remove-member-from-mess", removeMemberFromMess);
 router.get("/get-mess-members-info/:messId", getMessMembersInfo);
 router.patch("/update-mess-info/:messId", updateMessInfo);
 router.patch("/update-mess-logo/:messId", upload.single("messLogo"), updateMessLogo);
+router.patch("/update-mess-admin/:messId", updateMessAdmin);
 
 export default router;

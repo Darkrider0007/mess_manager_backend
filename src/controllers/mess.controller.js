@@ -273,6 +273,47 @@ const updateMessLogo = asyncHandler(async (req, res) => {
     }
 })
 
+const updateMessAdmin = asyncHandler(async (req, res) => {
+  try {
+    const messId = req.params.messId;
+    if (!messId) {
+      throw new ApiError(400, "Mess Id is required");
+    }
+
+    const { newAdminId } = req.body;
+    if (!newAdminId) {
+      throw new ApiError(400, "New Admin Id is required");
+    }
+
+    const userExist = await User.findById(newAdminId);
+    if (!userExist) {
+      throw new ApiError(404, "Cannot change admin to non-existing user");
+    }
+
+    const mess = await Mess.findById(messId);
+    if (!mess) {
+      throw new ApiError(404, "Mess not found");
+    }
+
+    if (mess.messAdmin.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "You are not authorized to change admin");
+    }
+
+    const isMemberOfTheMess = mess.messMembers.find(m => m.toString() === newAdminId);
+
+    if(!isMemberOfTheMess) {
+      throw new ApiError(400, "New Admin is not a member of the mess");
+    }
+
+    mess.messAdmin = newAdminId;
+    await mess.save();
+
+    res.status(200).json(new ApiResponse(200, mess, "Mess Admin Updated"));
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+});
+
 export {
   createNewMess,
   getMessInfo,
@@ -281,4 +322,5 @@ export {
   getMessMembersInfo,
   updateMessInfo,
   updateMessLogo,
+  updateMessAdmin,
 };
