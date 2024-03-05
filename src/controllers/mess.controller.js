@@ -23,10 +23,14 @@ const createNewMess = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Mess already exists");
     }
 
-    const messLogo = await uploadImageOnCloudinary(req.file?.path);
+    const imageLocalPath = req.file?.path;
+    if (!imageLocalPath) {
+      throw new ApiError(400, "Mess Logo is required");
+    }
+
+    const messLogo = await uploadImageOnCloudinary(imageLocalPath);
 
     if (!messLogo) {
-      fs.unlinkSync(req.file?.path);
       throw new ApiError(500, "Error while uploading image");
     }
 
@@ -42,7 +46,7 @@ const createNewMess = asyncHandler(async (req, res) => {
       throw new ApiError(500, "Error while creating new mess");
     }
 
-    res.status(201).json(ApiResponse(201, newMess, "Mess Created"));
+    res.status(201).json(new ApiResponse(201, newMess, "Mess Created"));
   } catch (error) {
     throw new ApiError(500, error.message);
   }
@@ -384,7 +388,20 @@ const deleteMess = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Mess Id is required");
     }
 
+    const mess = await Mess.findById(messId);
+    if (!mess) {
+      throw new ApiError(404, "Mess not found");
+    }
+
+    if (mess.messAdmin.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "You are not authorized to delete mess");
+    }
+
+    const messLogo = mess.messLogo;
+
     await Mess.findByIdAndDelete(messId);
+
+    await deleteImageFromCloudinary(messLogo);
 
     res.status(200).json(new ApiResponse(200, {}, "Mess Removed"));
   } catch (error) {
