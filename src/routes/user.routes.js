@@ -2,6 +2,7 @@ import Router from "express";
 import {
   getCurrentUser,
   getEnrolledMesses,
+  getTransactions,
   loginUser,
   logoutUser,
   newRefreshToken,
@@ -30,6 +31,7 @@ router
 router.route('/getEnrolledMesses').get(verifyJWT, getEnrolledMesses);
 
 router.route("/newRefreshToken").get(newRefreshToken);
+router.route("/getPaymentList").get(verifyJWT, getTransactions);
 
 
 export default router;

@@ -9,6 +9,7 @@ import {
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import Mess from "../models/mess.model.js";
+import IncomingAmount from "../models/incomingAmount.model.js";
 
 //////////////////////////////
 ////// Helper Functions /////
@@ -383,7 +384,7 @@ const newRefreshToken = asyncHandler(async (req, res) => {
 
 
 
-// Task: Add a controller for the list of the enrolled messes
+//  controller for the list of the enrolled messes
 
 const getEnrolledMesses = asyncHandler(async (req, res) => {
   try {
@@ -419,6 +420,57 @@ const getEnrolledMesses = asyncHandler(async (req, res) => {
   }
 });
 
+// controller for paid amount list
+const getTransactions = asyncHandler(async (req, res) => {
+  try {
+    const { page, limit } = req.query;
+    const options = {
+      page: parseInt(page) || 1,
+      limit: parseInt(limit) || 10,
+    };
+    const transactions = await IncomingAmount.aggregate([
+      {
+        $match: {
+          payedBy: req.user?._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "messes",
+          localField: "messID",
+          foreignField: "_id",
+          as: "messID",
+        },
+      },
+      {
+        $unwind: "$messID",
+      },
+      {
+        $project: {
+          id: 1,
+          payedBy: 1,
+          messID: {
+            id: 1,
+            messName: 1,
+            messLogo: 1,              
+          },
+          amount: 1,
+        },
+      },
+    ]).skip((options.page - 1) * options.limit).limit(options.limit);
+
+    if (!transactions) {
+      throw new ApiError(404, "Transactions not found");
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, transactions, "Transactions found successfully"));
+    
+  } catch (error) {
+    throw new ApiError(400, error.message);
+  }
+}); 
 
 export {
   registerUser,
@@ -430,5 +482,6 @@ export {
   updatePassword,
   newRefreshToken,
   getEnrolledMesses,
+  getTransactions,
 };
 
