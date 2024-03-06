@@ -8,6 +8,7 @@ import {
 } from "../utils/cloudinary.util.js";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import Mess from "../models/mess.model.js";
 
 //////////////////////////////
 ////// Helper Functions /////
@@ -381,7 +382,42 @@ const newRefreshToken = asyncHandler(async (req, res) => {
 }); 
 
 
+
 // Task: Add a controller for the list of the enrolled messes
+
+const getEnrolledMesses = asyncHandler(async (req, res) => {
+  try {
+    const messes = await Mess.aggregate([
+      {
+        $match: {
+          messMembers: req.user._id,
+        },
+      },
+      {
+        $project: {
+          id: 1,
+          messName: 1,
+          messDescription: 1,
+          messLogo: 1,
+          messAdmin: 1,
+          messMembers: 1,
+          messMenu: 1,
+        },
+      },
+    ]);
+
+    if (!messes) {
+      throw new ApiError(404, "Messes not found");
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, messes, "Messes found successfully"));
+    
+  } catch (error) {
+    throw new ApiError(400, error.message);
+  }
+});
 
 
 export {
@@ -392,6 +428,7 @@ export {
   updateUserDetails,
   updateUserAvatar,
   updatePassword,
-  newRefreshToken
+  newRefreshToken,
+  getEnrolledMesses,
 };
 

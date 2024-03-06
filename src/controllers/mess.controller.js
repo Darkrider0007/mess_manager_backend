@@ -126,7 +126,7 @@ const addMemberToMess = asyncHandler(async (req, res) => {
 
     const alreadyMember = mess.messMembers.find(m => m.toString() === memberId);
     if (alreadyMember) {
-      throw new ApiError(400, "Member already added");
+      throw new ApiError(400, "Member already in the mess");
     }
 
     mess.messMembers.push(memberId);
@@ -216,7 +216,7 @@ const updateMessInfo = asyncHandler(async (req, res) => {
 
         const { messName, messDescription } = req.body;
 
-        if (messName.trim() === "" && messDescription.trim() === "") {
+        if (messName?.trim() === "" && messDescription?.trim() === "") {
         throw new ApiError(400, "Mess Name or Description is required");
         }
     
@@ -408,8 +408,6 @@ const deleteMess = asyncHandler(async (req, res) => {
     throw new ApiError(500, error.message);
   }
 });
-    
-
 
 export {
   createNewMess,

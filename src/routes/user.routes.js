@@ -1,6 +1,7 @@
 import Router from "express";
 import {
   getCurrentUser,
+  getEnrolledMesses,
   loginUser,
   logoutUser,
   newRefreshToken,
@@ -26,7 +27,9 @@ router.route("/updateUserDetails").patch(verifyJWT, updateUserDetails);
 router
   .route("/updateUserAvatar")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
+router.route('/getEnrolledMesses').get(verifyJWT, getEnrolledMesses);
 
 router.route("/newRefreshToken").get(newRefreshToken);
+
 
 export default router;
