@@ -4,6 +4,7 @@ import IncomingAmount from "../models/incomingAmount.model.js";
 import { ApiError } from "../utils/ApiError.util.js";
 import { asyncHandler } from "../utils/asyncHandler.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
+import mongoose from "mongoose";
 
 
 const addIncomingAmount = asyncHandler(async (req, res) => {
@@ -39,6 +40,7 @@ const addIncomingAmount = asyncHandler(async (req, res) => {
   
       const newIncomingAmount = await IncomingAmount.create({
         payedBy: memberId,
+        messID,
         amount,
       });
       if (!newIncomingAmount) {
@@ -116,8 +118,56 @@ const updateIncomingAmount = asyncHandler(async (req, res) => {
 
 });
 
+const getIncomingTransactions = asyncHandler(async (req, res) => {
+    try {
+        const {page, limit} = req.query;
+        const options = {
+            page: parseInt(page) || 1,
+            limit: parseInt(limit) || 10,
+        };
+        const transactions= await IncomingAmount.aggregate([
+            {
+                $match: {
+                    messID: new mongoose.Types.ObjectId(req.params.messId)
+                }
+            },    
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "payedBy",
+                    foreignField: "_id",
+                    as: "payedBy"
+                }
+            },
+            {
+                $unwind: "$payedBy"
+            },
+            {
+                $project: {
+                    _id: 1,
+                    amount: 1,
+                    createdAt: 1,
+                    "payedBy._id": 1,
+                    "payedBy.fullName": 1,
+                    "payedBy.email": 1,
+                    "payedBy.userName": 1,
+                }
+            }      
+         ]).skip((options.page - 1) * options.limit).limit(options.limit);
+
+        res
+        .status(200)
+        .json(new ApiResponse(200, transactions, "Incoming Transactions"));
+
+        
+    } catch (error) {
+        throw new ApiError(500, error.message);
+    }
+});
+
 
 export {
     addIncomingAmount,
-    updateIncomingAmount
+    updateIncomingAmount,
+    getIncomingTransactions
 }

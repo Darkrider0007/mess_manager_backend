@@ -390,7 +390,7 @@ const getEnrolledMesses = asyncHandler(async (req, res) => {
     const messes = await Mess.aggregate([
       {
         $match: {
-          messMembers: req.user._id,
+          messMembers: req.user?._id,
         },
       },
       {
