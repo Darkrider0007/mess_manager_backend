@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 
-const incomingMoneySchema = new mongoose.Schema({
+const incomingAmountSchema = new mongoose.Schema({
     payedBy : {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -14,4 +14,4 @@ const incomingMoneySchema = new mongoose.Schema({
 },{timestamps: true});
 
 
-export default mongoose.model("IncomingMoney", incomingMoneySchema);
+export default mongoose.model("IncomingAmount", incomingAmountSchema);

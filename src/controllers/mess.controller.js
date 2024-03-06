@@ -6,7 +6,6 @@ import { deleteImageFromCloudinary, uploadImageOnCloudinary } from "../utils/clo
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 import mongoose from "mongoose";
 import User from "../models/user.model.js";
-import IncomingMoney from "../models/incomingMoney.model.js";
 
 const createNewMess = asyncHandler(async (req, res) => {
   try {
@@ -410,57 +409,6 @@ const deleteMess = asyncHandler(async (req, res) => {
   }
 });
 
-const addIncomingMoney = asyncHandler(async (req, res) => {
-  try {
-    const  messID  = req.params.messId;
-    if (!messID) {
-      throw new ApiError(400, "Mess Id is required");
-    }
-
-    const { memberId, amount } = req.body;
-    if (!memberId || !amount) {
-      throw new ApiError(400, "Member Id and Amount are required");
-    }
-
-    const mess = await Mess.findById(messID);
-    if (!mess) {
-      throw new ApiError(404, "Mess not found");
-    }
-
-    if (mess.messAdmin.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "You are not authorized to add incoming money");
-    }
-
-    const member = await User.findById(memberId);
-    if (!member) {
-      throw new ApiError(404, "Member not found");
-    }
-
-    const isMemberOfTheMess = mess.messMembers.find(m => m.toString() === member._id.toString());
-    if (isMemberOfTheMess) {
-      throw new ApiError(400, "Member not in the mess");
-    }
-
-    const newIncomingMoney = await IncomingMoney.create({
-      payedBy: memberId,
-      amount,
-    });
-    if (!newIncomingMoney) {
-      throw new ApiError(500, "Error while adding incoming money");
-    }
-
-    mess.totalMoney += amount;
-    await mess.save();
-
-    res
-    .status(201)
-    .json(new ApiResponse(201, newIncomingMoney, "Incoming Money Added"));
-
-  } catch (error) {
-    throw new ApiError(500, error.message);
-  }
-});
-
 export {
   createNewMess,
   getMessInfo,
@@ -473,5 +421,4 @@ export {
   addMessMenu,
   removeMessMenu,
   deleteMess,
-  addIncomingMoney,
 };
