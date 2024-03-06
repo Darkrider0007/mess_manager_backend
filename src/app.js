@@ -23,11 +23,13 @@ import healthCheckRouter  from './routes/healthCheck.routes.js';
 import userRouter from './routes/user.routes.js';
 import messRouter from './routes/mess.routes.js';
 import incomingAmount from './routes/incomingAmount.routes.js';
+import expanseRouter from './routes/expanse.routes.js';
 
 
 app.use('/api/v1/health', healthCheckRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/mess', messRouter);
 app.use('/api/v1/incomingAmount', incomingAmount);
+app.use('/api/v1/expanse', expanseRouter);
 
 export { app };
