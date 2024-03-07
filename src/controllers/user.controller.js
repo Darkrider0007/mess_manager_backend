@@ -449,6 +449,7 @@ const getTransactions = asyncHandler(async (req, res) => {
         $project: {
           id: 1,
           payedBy: 1,
+          description: 1,
           messID: {
             id: 1,
             messName: 1,
