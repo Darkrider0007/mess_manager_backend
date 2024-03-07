@@ -6,11 +6,13 @@ import { ApiResponse } from "../utils/ApiResponse.util.js";
 import mongoose from "mongoose";
 
 
-
 const addExpanse = asyncHandler(async (req, res) => {
     try {
         const messID = req.params?.messID;
-        const { expanseFor, amount } = req.body;
+        const { expanseFor, description ,  amount } = req.body;
+        if([expanseFor, description, amount].some(pra => pra.trim() === "")){
+            throw new ApiError(400, "Expanse Reason, Description and Amount are required");
+        }
 
         const mess = await Mess.findById(messID);
         if (!mess) {
@@ -19,6 +21,7 @@ const addExpanse = asyncHandler(async (req, res) => {
 
         const expanse = await Expanse.create({
             expanseFor,
+            description,
             messID,
             amount,
         });
@@ -37,14 +40,17 @@ const addExpanse = asyncHandler(async (req, res) => {
 const updateExpanse = asyncHandler(async (req, res) => {
     try {
         const expanseID = req.params?.expanseID;
-        const { expanseFor, amount } = req.body;
+        const { expanseFor, description, amount } = req.body;
+        if(expanseFor?.trim() == "" && description?.trim() == "" && amount?.trim() == ""){
+            throw new ApiError(400, "Expanse For or Description or Amount is required")
+        }
 
         const expanse = await Expanse.findById(expanseID);
         if (!expanse) {
             throw new ApiError(404, "Expanse not found");
         }
 
-        if(expanse.amount === amount){
+        if((expanse.amount == amount) && (expanse.expanseFor == expanseFor) && (expanse.description == description)){
             throw new ApiError(400, "No changes found");
         }
         
@@ -59,13 +65,18 @@ const updateExpanse = asyncHandler(async (req, res) => {
 
         mess.totalMoney = parseFloat(mess.totalMoney) + parseFloat(expanse.amount) - parseFloat(amount);
 
-        if(expanseFor!== "" || (expanse.expanseFor !== expanseFor)){
+        if(expanseFor!== "" && (expanse.expanseFor !== expanseFor)){
             expanse.expanseFor = expanseFor;
         }
 
-        if(amount!== "" || (expanse.amount !== amount)){
+        if(description!== "" && (expanse.description !== description)){
+            expanse.description = description;
+        }
+
+        if(amount!== "" && (expanse.amount !== amount)){
             expanse.amount = amount;
         }
+
         await expanse.save();
         await mess.save();
 
@@ -107,6 +118,7 @@ const getExpanse = asyncHandler(async (req, res) => {
         {
             $project: {
                 expanseFor: 1,
+                description: 1,
                 amount: 1,
                 messName: "$mess.messName",
                 messLogo: "$mess.messLogo",
