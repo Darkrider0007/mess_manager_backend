@@ -14,9 +14,9 @@ const addIncomingAmount = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Mess Id is required");
       }
   
-      const { memberId, amount } = req.body;
-      if (!memberId || !amount) {
-        throw new ApiError(400, "Member Id and Amount are required");
+      const { memberId, description, amount } = req.body;
+      if ([memberId, description, amount].some(pra => pra.trim() === "")) {
+        throw new ApiError(400, "Member Id, Description and Amount are required");
       }
   
       const mess = await Mess.findById(messID);
@@ -40,6 +40,7 @@ const addIncomingAmount = asyncHandler(async (req, res) => {
   
       const newIncomingAmount = await IncomingAmount.create({
         payedBy: memberId,
+        description,
         messID,
         amount,
       });
@@ -66,9 +67,9 @@ const updateIncomingAmount = asyncHandler(async (req, res) => {
           throw new ApiError(400, "Transaction Id is required");
         }
     
-        const { messID, memberId, amount } = req.body;
-        if (!memberId || !amount || !messID) {
-          throw new ApiError(400, "Member Id and Amount are required");
+        const { memberId, description, amount } = req.body;
+        if (!memberId && !description && !amount) {
+          throw new ApiError(400, "Member Id or description or Amount are required");
         }
 
         const incomingAmount = await IncomingAmount.findById(transactionId);
@@ -76,11 +77,11 @@ const updateIncomingAmount = asyncHandler(async (req, res) => {
           throw new ApiError(404, "Transaction not found");
         }
 
-        if(incomingAmount.amount == amount){
-            throw new ApiError(400, "No change in amount");
+        if(incomingAmount?.payedBy == memberId && incomingAmount?.description == description && incomingAmount?.amount == amount){
+            throw new ApiError(400, "No changes found");
         }
-    
-        const mess = await Mess.findById(messID);
+        
+        const mess = await Mess.findById(incomingAmount.messID);
         if (!mess) {
           throw new ApiError(404, "Mess not found");
         }
@@ -100,7 +101,14 @@ const updateIncomingAmount = asyncHandler(async (req, res) => {
         }
     
         const previousAmount = incomingAmount.amount;
-    
+
+        if((incomingAmount.payedBy.toString() !== memberId.toString()))
+        incomingAmount.payedBy = memberId;
+
+        if(description.trim()!="" && (incomingAmount.description !== description))
+        incomingAmount.description = description;
+
+        if(amount.trim()!="" && (incomingAmount.amount !== amount))    
         incomingAmount.amount = amount;
     
         await incomingAmount.save();
@@ -140,18 +148,22 @@ const getIncomingTransactions = asyncHandler(async (req, res) => {
                 }
             },
             {
-                $unwind: "$payedBy"
+              $unwind: "$payedBy"
             },
             {
-                $project: {
-                    _id: 1,
-                    amount: 1,
-                    createdAt: 1,
-                    "payedBy._id": 1,
-                    "payedBy.fullName": 1,
-                    "payedBy.email": 1,
-                    "payedBy.userName": 1,
-                }
+              $project: {
+                _id: 1,
+                description: 1,
+                payedBy:{
+                  _id : 1,
+                  fullName: 1,
+                  email: 1,
+                  userAvatar:1
+                },
+                amount: 1,
+                createdAt: 1,
+                updatedAt: 1
+              }
             }      
          ]).skip((options.page - 1) * options.limit).limit(options.limit);
 
@@ -165,9 +177,46 @@ const getIncomingTransactions = asyncHandler(async (req, res) => {
     }
 });
 
+const deleteIncomingAmount = asyncHandler(async (req, res) => {
+    try {
+        const transactionId = req.params.transactionId;
+        if (!transactionId) {
+          throw new ApiError(400, "Transaction Id is required");
+        }
+    
+        const incomingAmount = await IncomingAmount.findById(transactionId);
+        if (!incomingAmount) {
+          throw new ApiError(404, "Transaction not found");
+        }
+
+        const mess = await Mess.findById(incomingAmount.messID);
+
+        if (!mess) {
+          throw new ApiError(404, "Mess not found");
+        }
+
+        if (mess.messAdmin.toString() !== req.user._id.toString()) {
+          throw new ApiError(403, "You are not authorized to delete incoming money");
+        }
+
+        mess.totalMoney = parseFloat(mess.totalMoney) - parseFloat(incomingAmount.amount);
+
+
+        await IncomingAmount.findByIdAndDelete(transactionId);
+        await mess.save();
+
+        res
+        .status(200)
+        .json(new ApiResponse(200, mess, "Incoming Money Deleted"));
+    } catch (error) {
+        throw new ApiError(500, error.message);
+    }
+});
+
 
 export {
     addIncomingAmount,
     updateIncomingAmount,
-    getIncomingTransactions
+    getIncomingTransactions,
+    deleteIncomingAmount,
 }

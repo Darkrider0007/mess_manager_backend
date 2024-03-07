@@ -30,6 +30,6 @@ app.use('/api/v1/health', healthCheckRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/mess', messRouter);
 app.use('/api/v1/incomingAmount', incomingAmount);
-app.use('/api/v1/expanse', expanseRouter);
+app.use('/api/v1/expanses', expanseRouter);
 
 export { app };

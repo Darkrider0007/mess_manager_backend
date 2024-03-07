@@ -7,6 +7,10 @@ const incomingAmountSchema = new mongoose.Schema({
         ref: "User",
         required: [true, "User is required"],
     },
+    description : {
+        type: String,
+        required: [true, "Description is required"],
+    },
     messID : {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Mess",

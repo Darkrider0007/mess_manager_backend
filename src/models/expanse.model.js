@@ -6,6 +6,10 @@ const expanseSchema = new mongoose.Schema({
         type: String,
         required: [true, "Expanse Reason is required"],
     },
+    description : {
+        type: String,
+        required: [true, "Description is required"],
+    },
     messID : {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Mess",
