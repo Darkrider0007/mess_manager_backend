@@ -13,7 +13,7 @@ Mess-Manager Backend is the backend component of the Mess-Manager application. I
   ```
   PORT=8000
 CORS_ORIGIN=*
-MONGO_URI=m
+MONGO_URI=
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
