@@ -442,7 +442,6 @@ const getEnrolledMesses = asyncHandler(async (req, res) => {
 
 const getMessesById = asyncHandler(async (req, res) => {
   try {
-    console.log(req.params.id);
     const messes = await Mess.aggregate([
       {
         $match: {
