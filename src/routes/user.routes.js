@@ -3,6 +3,7 @@ import {
   getCurrentUser,
   getEnrolledMesses,
   getTransactions,
+  getUserById,
   loginUser,
   logoutUser,
   newRefreshToken,
@@ -23,15 +24,15 @@ router.route("/login").post(loginUser);
 
 router.route("/logout").get(verifyJWT, logoutUser);
 router.route("/getCurrentUser").get(verifyJWT, getCurrentUser);
+router.route("/getUserById/:id").get(verifyJWT, getUserById);
 router.route("/updatePassword").patch(verifyJWT, updatePassword);
 router.route("/updateUserDetails").patch(verifyJWT, updateUserDetails);
 router
   .route("/updateUserAvatar")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
-router.route('/getEnrolledMesses').get(verifyJWT, getEnrolledMesses);
+router.route("/getEnrolledMesses").get(verifyJWT, getEnrolledMesses);
 
 router.route("/newRefreshToken").get(newRefreshToken);
 router.route("/getPaymentList").get(verifyJWT, getTransactions);
-
 
 export default router;

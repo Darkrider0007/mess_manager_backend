@@ -201,6 +201,24 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserById = asyncHandler(async (req, res) => {
+  // get user details from the request object
+  // send response
+  try {
+    const user = await User.findById(req.params.id).select(
+      "-password -refreshToken"
+    );
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, user, "User found successfully"));
+  } catch (error) {
+    throw new ApiError(400, error.message);
+  }
+});
+
 const updateUserDetails = asyncHandler(async (req, res) => {
   // collect user details from the request body
   // check if all fields are provided
@@ -293,7 +311,6 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   }
 });
 
-
 const updatePassword = asyncHandler(async (req, res) => {
   // collect user details from the request body
   // check if all fields are provided
@@ -334,7 +351,6 @@ const updatePassword = asyncHandler(async (req, res) => {
   }
 });
 
-
 const newRefreshToken = asyncHandler(async (req, res) => {
   // collect refresh token from the request cookies
   // check if refresh token is provided
@@ -348,12 +364,18 @@ const newRefreshToken = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Refresh token is required");
     }
 
-    const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const decodedToken = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
 
     const user = await User.findById(decodedToken.id);
 
     if (!user) {
-      throw new ApiError(404, "Token is not valid or expired, does not verify the user");
+      throw new ApiError(
+        404,
+        "Token is not valid or expired, does not verify the user"
+      );
     }
 
     if (user.refreshToken != refreshToken) {
@@ -380,9 +402,7 @@ const newRefreshToken = asyncHandler(async (req, res) => {
   } catch (error) {
     throw new ApiError(400, error.message);
   }
-}); 
-
-
+});
 
 //  controller for the list of the enrolled messes
 
@@ -412,9 +432,8 @@ const getEnrolledMesses = asyncHandler(async (req, res) => {
     }
 
     res
-    .status(200)
-    .json(new ApiResponse(200, messes, "Messes found successfully"));
-    
+      .status(200)
+      .json(new ApiResponse(200, messes, "Messes found successfully"));
   } catch (error) {
     throw new ApiError(400, error.message);
   }
@@ -453,31 +472,35 @@ const getTransactions = asyncHandler(async (req, res) => {
           messID: {
             id: 1,
             messName: 1,
-            messLogo: 1,              
+            messLogo: 1,
           },
           amount: 1,
         },
       },
-    ]).skip((options.page - 1) * options.limit).limit(options.limit);
+    ])
+      .skip((options.page - 1) * options.limit)
+      .limit(options.limit);
 
     if (!transactions) {
       throw new ApiError(404, "Transactions not found");
     }
 
     res
-    .status(200)
-    .json(new ApiResponse(200, transactions, "Transactions found successfully"));
-    
+      .status(200)
+      .json(
+        new ApiResponse(200, transactions, "Transactions found successfully")
+      );
   } catch (error) {
     throw new ApiError(400, error.message);
   }
-}); 
+});
 
 export {
   registerUser,
   loginUser,
   logoutUser,
   getCurrentUser,
+  getUserById,
   updateUserDetails,
   updateUserAvatar,
   updatePassword,
@@ -485,4 +508,3 @@ export {
   getEnrolledMesses,
   getTransactions,
 };
-
