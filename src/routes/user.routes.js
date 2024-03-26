@@ -2,6 +2,7 @@ import Router from "express";
 import {
   getCurrentUser,
   getEnrolledMesses,
+  getMessesById,
   getTransactions,
   getUserById,
   loginUser,
@@ -31,6 +32,7 @@ router
   .route("/updateUserAvatar")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 router.route("/getEnrolledMesses").get(verifyJWT, getEnrolledMesses);
+router.route("/getMessById/:id").get(verifyJWT, getMessesById);
 
 router.route("/newRefreshToken").get(newRefreshToken);
 router.route("/getPaymentList").get(verifyJWT, getTransactions);

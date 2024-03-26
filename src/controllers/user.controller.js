@@ -10,6 +10,7 @@ import fs from "fs";
 import jwt from "jsonwebtoken";
 import Mess from "../models/mess.model.js";
 import IncomingAmount from "../models/incomingAmount.model.js";
+import mongoose from "mongoose";
 
 //////////////////////////////
 ////// Helper Functions /////
@@ -439,6 +440,36 @@ const getEnrolledMesses = asyncHandler(async (req, res) => {
   }
 });
 
+const getMessesById = asyncHandler(async (req, res) => {
+  try {
+    console.log(req.params.id);
+    const messes = await Mess.aggregate([
+      {
+        $match: {
+          messMembers: new mongoose.Types.ObjectId(req.params.id),
+        },
+      },
+      {
+        $project: {
+          id: 1,
+          messName: 1,
+          messLogo: 1,
+        },
+      },
+    ]);
+
+    if (!messes) {
+      throw new ApiError(404, "Messes not found");
+    }
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, messes, "Messes found successfully"));
+  } catch (error) {
+    throw new ApiError(400, error.message);
+  }
+});
+
 // controller for paid amount list
 const getTransactions = asyncHandler(async (req, res) => {
   try {
@@ -507,4 +538,5 @@ export {
   newRefreshToken,
   getEnrolledMesses,
   getTransactions,
+  getMessesById,
 };
