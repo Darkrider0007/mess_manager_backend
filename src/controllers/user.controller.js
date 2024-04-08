@@ -500,11 +500,13 @@ const getTransactions = asyncHandler(async (req, res) => {
           payedBy: 1,
           description: 1,
           messID: {
-            id: 1,
+            _id: 1,
             messName: 1,
             messLogo: 1,
           },
           amount: 1,
+          createdAt: 1,
+          updatedAt: 1,
         },
       },
     ])
