@@ -422,6 +422,7 @@ const getEnrolledMesses = asyncHandler(async (req, res) => {
           messDescription: 1,
           messLogo: 1,
           messAdmin: 1,
+          totalMoney: 1,
           messMembers: 1,
           messMenu: 1,
         },
