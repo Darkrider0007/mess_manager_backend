@@ -4,6 +4,7 @@ import {
   addIncomingAmount,
   deleteIncomingAmount,
   getIncomingTransactions,
+  getTransactionsByUserIdInMess,
   updateIncomingAmount,
 } from "../controllers/incomingAmount.controller.js";
 
@@ -18,6 +19,10 @@ router.patch("/update-amount/:transactionId", updateIncomingAmount);
 
 router.get("/get-incoming-transactions/:messId", getIncomingTransactions);
 
-router.route('/delete-amount/:transactionId').delete(deleteIncomingAmount);
+router.route("/delete-amount/:transactionId").delete(deleteIncomingAmount);
+
+router
+  .route("/get-transactions-by-member/:messId/:userId")
+  .get(getTransactionsByUserIdInMess);
 
 export default router;
