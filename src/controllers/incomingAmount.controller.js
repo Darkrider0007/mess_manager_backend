@@ -235,7 +235,6 @@ const getTransactionsByUserIdInMess = asyncHandler(async (req, res) => {
       page: parseInt(page) || 1,
       limit: parseInt(limit) || 10,
     };
-    console.log(req.params.messId, req.params.userId);
     const transactions = await IncomingAmount.aggregate([
       {
         $match: {
