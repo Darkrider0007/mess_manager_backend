@@ -10,8 +10,6 @@ const addExpanse = asyncHandler(async (req, res) => {
     const messID = req.params?.messID;
     const { expanseFor, description, amount } = req.body;
 
-    console.log(expanseFor, description, amount);
-
     if (
       expanseFor?.trim() == "" &&
       description?.trim() == "" &&
