@@ -120,7 +120,7 @@ const updateIncomingAmount = asyncHandler(async (req, res) => {
     if (description.trim() != "" && incomingAmount.description !== description)
       incomingAmount.description = description;
 
-    if (amount.trim() != "" && incomingAmount.amount !== amount)
+    if (amount != "" && incomingAmount.amount !== amount)
       incomingAmount.amount = amount;
 
     await incomingAmount.save();
