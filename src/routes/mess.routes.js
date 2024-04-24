@@ -21,15 +21,18 @@ router.use(verifyJWT);
 
 router.post("/create-new-mess", upload.single("messLogo"), createNewMess);
 router.get("/get-mess-info/:messId", getMessInfo);
-router.post("/add-member-to-mess", addMemberToMess);
-router.delete("/remove-member-from-mess", removeMemberFromMess);
+router.post("/add-member-to-mess/:messId", addMemberToMess);
+router.patch("/remove-member-from-mess/:messId", removeMemberFromMess);
 router.get("/get-mess-members-info/:messId", getMessMembersInfo);
 router.patch("/update-mess-info/:messId", updateMessInfo);
-router.patch("/update-mess-logo/:messId", upload.single("messLogo"), updateMessLogo);
+router.patch(
+  "/update-mess-logo/:messId",
+  upload.single("messLogo"),
+  updateMessLogo
+);
 router.patch("/update-mess-admin/:messId", updateMessAdmin);
 router.patch("/add-mess-menu/:messId", addMessMenu);
 router.patch("/remove-mess-menu/:messId", removeMessMenu);
 router.delete("/delete-mess/:messId", deleteMess);
-
 
 export default router;

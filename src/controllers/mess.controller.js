@@ -108,8 +108,9 @@ const getMessInfo = asyncHandler(async (req, res) => {
 
 const addMemberToMess = asyncHandler(async (req, res) => {
   try {
-    const { messId, memberId } = req.body;
-    if (memberId.trim() === "" || messId.trim() === "") {
+    const { messId } = req.params;
+    const { email } = req.body;
+    if (email.trim() === "" || messId.trim() === "") {
       throw new ApiError(400, "Mess Id and Member Id are required");
     }
 
@@ -122,30 +123,37 @@ const addMemberToMess = asyncHandler(async (req, res) => {
       throw new ApiError(403, "You are not authorized to add member");
     }
 
-    const member = await User.findById(memberId);
+    const member = await User.findOne({
+      email,
+    });
     if (!member) {
       throw new ApiError(404, "Member not found");
     }
 
-    const alreadyMember = mess.messMembers.find(m => m.toString() === memberId);
+    const alreadyMember = mess.messMembers.find(
+      m => m.toString() === member._id.toString()
+    );
     if (alreadyMember) {
       throw new ApiError(400, "Member already in the mess");
     }
 
-    mess.messMembers.push(memberId);
+    mess.messMembers.push(member._id.toString());
     await mess.save();
 
     res
       .status(200)
-      .json(new ApiResponse(200, { "member ID": memberId }, "Member Added"));
+      .json(new ApiResponse(200, { "member ID": member._id }, "Member Added"));
   } catch (error) {
     throw new ApiError(500, error.message);
   }
 });
 
 const removeMemberFromMess = asyncHandler(async (req, res) => {
-  const { messId, memberId } = req.body;
-  if (memberId.trim() === "" || messId.trim() === "") {
+  const { messId } = req.params;
+  const { memberId } = req.body;
+  console.log(req.body);
+  console.log(messId, memberId);
+  if (memberId === "" || messId === "") {
     throw new ApiError(400, "Mess Id and Member Id are required");
   }
 
