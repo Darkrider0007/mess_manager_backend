@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "test": "mocha 'test/**/*.spec.js'"
+    "test": "mocha 'test/**/*.spec.js'",
+    "build": "webpack"
   },
   "author": "THE HALF DAZON",
   "license": "ISC",
