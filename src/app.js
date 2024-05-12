@@ -17,6 +17,12 @@ app.use(express.static("public"));
 
 app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "API is working 🚀",
+  });
+});
+
 import healthCheckRouter from "./routes/healthCheck.routes.js";
 import userRouter from "./routes/user.routes.js";
 import messRouter from "./routes/mess.routes.js";
