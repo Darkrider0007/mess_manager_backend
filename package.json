@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "test": "mocha 'test/**/*.spec.js'",
-    "build": "webpack"
+    "test": "mocha 'test/**/*.spec.js'"
   },
   "author": "THE HALF DAZON",
   "license": "ISC",
@@ -35,8 +34,6 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.0",
     "mongoose-aggregate-paginate-v2": "^1.0.7",
-    "multer": "^1.4.5-lts.1",
-    "vercel": "^34.1.11",
-    "webpack": "^5.91.0"
+    "multer": "^1.4.5-lts.1"
   }
 }
