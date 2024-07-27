@@ -4,6 +4,15 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+app.use((req, res, next) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://66a5502…--visionary-valkyrie-8115d8.netlify.app"
+  );
+  // ... other CORS headers
+  next();
+});
+
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN,
